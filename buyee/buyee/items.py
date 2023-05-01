@@ -8,7 +8,7 @@ from scrapy import Item, Field
 class BuyeeItem(Item):
     productLink = Field()
     productImage = Field() 
-    productPriceUnfiltered = Field()
+    productPrice = Field()
     productName = Field()
     productPrice = Field()
 

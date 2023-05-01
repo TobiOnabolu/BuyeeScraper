@@ -12,7 +12,7 @@ class AuctionSpider(scrapy.Spider):
             item['productName'] = product.css('img.g-thumbnail__image::attr(alt)').get()
             item['productLink'] = product.css('a::attr(href)').get()
             item['productImage'] = product.css('img.g-thumbnail__image::attr(data-src)').get() 
-            item['productPriceUnfiltered'] = product.css('span.g-priceFx::text').get()
+            item['productPrice'] = product.css('span.g-priceFx::text').get()
             
             yield item
         

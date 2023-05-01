@@ -44,10 +44,12 @@ ROBOTSTXT_OBEY = False
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-#SPIDER_MIDDLEWARES = {
+SPIDER_MIDDLEWARES = {
     #"buyee.middlewares.BuyeeSpiderMiddleware": 543,
-    #'scrapy_auto_trans.spidermiddlewares.autotrans.GoogleAutoTranslationMiddleware': 701
-#}
+    #'scrapy_auto_trans.spidermiddlewares.autotrans.GoogleAutoTranslationMiddleware': 701,
+    #'scrapy_deltafetch.DeltaFetch': 100 Not needed because each request to a url is not unique for the products displayed on that url
+}
+#DELTAFETCH_ENABLED = True
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
@@ -64,8 +66,9 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    #"buyee.pipelines.BuyeePipeline": 300,
-    'buyee.pipelines.TranslateNamePipeline': 297
+    "buyee.pipelines.TakeNewProductsPipeline": 290,
+    'buyee.pipelines.TranslateNamePipeline': 297,
+    'buyee.pipelines.CleanPricePipeline' : 295
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -83,7 +86,7 @@ AUTOTHROTTLE_ENABLED = True
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
-#HTTPCACHE_ENABLED = True
+HTTPCACHE_ENABLED = True
 #HTTPCACHE_EXPIRATION_SECS = 0
 #HTTPCACHE_DIR = "httpcache"
 #HTTPCACHE_IGNORE_HTTP_CODES = []
@@ -93,3 +96,19 @@ AUTOTHROTTLE_ENABLED = True
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
+
+FEEDS = {
+    # location where to save results
+    'auction.jsonl': {
+        # file format like json, jsonlines, xml and csv
+        'format': 'jsonl',
+        # use unicode text encoding:
+        'encoding': 'utf8',
+        # whether to export empty fields
+        'store_empty': False,
+        # we can also restrict to export only specific fields like: title and votes:
+        #'fields': ["title", "votes"],
+        # every run will create new file, if False is set every run will append results to the existing ones
+        'overwrite': False,
+    },
+}
