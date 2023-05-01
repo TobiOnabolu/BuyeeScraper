@@ -9,7 +9,7 @@ scrapy startproject projectfoldername
 scrapy runspider spiderfile.py -O jsonfilename.json
 
 ## Run spider (from buyee directory)
-scrapy crawl spidername -O jsonfilename.json
+scrapy crawl auction -O auction.json
 
 ## css select href
 a::attr(href)

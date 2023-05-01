@@ -6,7 +6,7 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 
 
 class BuyeePipeline:
@@ -17,11 +17,16 @@ class BuyeePipeline:
 
 class TranslateNamePipeline:
     def __init__(self):
-        self.translator = Translator()
+        self.translator = GoogleTranslator(source='auto', target='en')
         
     def process_item(self, item, spider):
         name = item.get('productName')
         if name:
-            translated_name = self.translator.translate(name, dest='en').text
-            item['productName'] = translated_name
+            try: 
+                translated_name = self.translator.translate(name)
+                item['productName'] = translated_name
+            except:
+                pass
+            
+
         return item
