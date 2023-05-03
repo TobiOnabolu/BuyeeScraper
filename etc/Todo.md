@@ -1,14 +1,14 @@
 # TODO
 
-Rotate proxies https://www.reddit.com/r/scrapy/comments/xw15vg/403_response_in_ide_but_can_still_visit_url_in/
-
-Rotate headers  https://scrapfly.io/blog/web-scraping-with-scrapy/
+Rotate proxies https://www.reddit.com/r/scrapy/comments/xw15vg/403_response_in_ide_but_can_still_visit_url_in/ this first https://github.com/rejoiceinhope/scrapy-proxy-pool/network/dependents if not working use https://github.com/jundymek/free-proxy + https://github.com/TeamHG-Memex/scrapy-rotating-proxies
 
 Make pipeline to handle keyword from derek
 
 Add efficient pagination so im not making multiple requests
 
 Change to csv export and update takenewproducts check
+
+Add my own ban detection policy so i dont have to comment out for everyone that uses the file
 
 Make diff spiders for diff stores but start url should have multiple if same store but diff genders
 

@@ -12,12 +12,86 @@ BOT_NAME = "buyee"
 SPIDER_MODULES = ["buyee.spiders"]
 NEWSPIDER_MODULE = "buyee.spiders"
 
+# Obey robots.txt rules
+ROBOTSTXT_OBEY = False
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
 
-# Obey robots.txt rules
-ROBOTSTXT_OBEY = False
+FAKEUSERAGENT_PROVIDERS = [
+    'scrapy_fake_useragent.providers.FakeUserAgentProvider',  # this is the first provider we'll try
+    'scrapy_fake_useragent.providers.FakerProvider',  # if FakeUserAgentProvider fails, we'll use faker to generate a user-agent string for us
+    'scrapy_fake_useragent.providers.FixedUserAgentProvider',  # fall back to USER_AGENT value
+]
+
+RANDOM_UA_PER_PROXY = True # Allows switch of header per proxy
+
+# scrapy-proxy-pool
+PROXY_POOL_ENABLED = True
+PROXY_POOL_REFRESH_INTERVAL = 1
+PROXY_POOL_FORCE_REFRESH = True
+
+# Enable or disable downloader middlewares
+# See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
+DOWNLOADER_MIDDLEWARES = {
+#    "buyee.middlewares.BuyeeDownloaderMiddleware": 543,
+    'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': None, # Disabling to allow downloaded user agent to handle
+    'scrapy.contrib.downloadermiddleware.retry.RetryMiddleware': None, # Disabling to allow downloaded user agent to handle
+    'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 700, # Handles generating random useragent
+    'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 701, # Retrying user agents
+    'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 610,  # Rotating proxies
+    'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620 # Checking if proxies fail
+}
+    
+# Configure item pipelines
+# See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
+ITEM_PIPELINES = {
+    "buyee.pipelines.TakeNewProductsPipeline": 290, # Add only new products to our db
+    'buyee.pipelines.TranslateNamePipeline': 297, # Translate japanese names to english
+    'buyee.pipelines.CleanPricePipeline' : 295 # Sanitizing price data
+}
+
+# Set settings whose default value is deprecated to a future-proof value
+REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
+TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
+FEED_EXPORT_ENCODING = "utf-8"
+
+FEEDS = {
+    # location where to save results
+    'auction.jsonl': {
+        # file format like json, jsonlines, xml and csv
+        'format': 'jsonl',
+        # use unicode text encoding:
+        'encoding': 'utf8',
+        # whether to export empty fields
+        'store_empty': False,
+        # we can also restrict to export only specific fields like: title and votes:
+        #'fields': ["title", "votes"],
+        # every run will create new file, if False is set every run will append results to the existing ones
+        'overwrite': False,
+    },
+}
+
+# Enable and configure the AutoThrottle extension (disabled by default)
+# See https://docs.scrapy.org/en/latest/topics/autothrottle.html
+AUTOTHROTTLE_ENABLED = True
+# The initial download delay
+#AUTOTHROTTLE_START_DELAY = 5
+# The maximum download delay to be set in case of high latencies
+#AUTOTHROTTLE_MAX_DELAY = 60
+# The average number of requests Scrapy should be sending in parallel to
+# each remote server
+#AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
+# Enable showing throttling stats for every response received:
+#AUTOTHROTTLE_DEBUG = False
+
+# Enable and configure HTTP caching (disabled by default)
+# See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
+HTTPCACHE_ENABLED = False
+#HTTPCACHE_EXPIRATION_SECS = 0
+#HTTPCACHE_DIR = "httpcache"
+#HTTPCACHE_IGNORE_HTTP_CODES = []
+#HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -42,73 +116,17 @@ ROBOTSTXT_OBEY = False
 #    "Accept-Language": "en",
 #}
 
-# Enable or disable spider middlewares
-# See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-SPIDER_MIDDLEWARES = {
-    #"buyee.middlewares.BuyeeSpiderMiddleware": 543,
-    #'scrapy_auto_trans.spidermiddlewares.autotrans.GoogleAutoTranslationMiddleware': 701,
-    #'scrapy_deltafetch.DeltaFetch': 100 Not needed because each request to a url is not unique for the products displayed on that url
-}
-#DELTAFETCH_ENABLED = True
-
-# Enable or disable downloader middlewares
-# See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
-#    "buyee.middlewares.BuyeeDownloaderMiddleware": 543,
-#}
-
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
 #EXTENSIONS = {
 #    "scrapy.extensions.telnet.TelnetConsole": None,
 #}
 
-# Configure item pipelines
-# See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-    "buyee.pipelines.TakeNewProductsPipeline": 290,
-    'buyee.pipelines.TranslateNamePipeline': 297,
-    'buyee.pipelines.CleanPricePipeline' : 295
-}
-
-# Enable and configure the AutoThrottle extension (disabled by default)
-# See https://docs.scrapy.org/en/latest/topics/autothrottle.html
-AUTOTHROTTLE_ENABLED = True
-# The initial download delay
-#AUTOTHROTTLE_START_DELAY = 5
-# The maximum download delay to be set in case of high latencies
-#AUTOTHROTTLE_MAX_DELAY = 60
-# The average number of requests Scrapy should be sending in parallel to
-# each remote server
-#AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
-# Enable showing throttling stats for every response received:
-#AUTOTHROTTLE_DEBUG = False
-
-# Enable and configure HTTP caching (disabled by default)
-# See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
-HTTPCACHE_ENABLED = True
-#HTTPCACHE_EXPIRATION_SECS = 0
-#HTTPCACHE_DIR = "httpcache"
-#HTTPCACHE_IGNORE_HTTP_CODES = []
-#HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
-
-# Set settings whose default value is deprecated to a future-proof value
-REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
-TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
-FEED_EXPORT_ENCODING = "utf-8"
-
-FEEDS = {
-    # location where to save results
-    'auction.jsonl': {
-        # file format like json, jsonlines, xml and csv
-        'format': 'jsonl',
-        # use unicode text encoding:
-        'encoding': 'utf8',
-        # whether to export empty fields
-        'store_empty': False,
-        # we can also restrict to export only specific fields like: title and votes:
-        #'fields': ["title", "votes"],
-        # every run will create new file, if False is set every run will append results to the existing ones
-        'overwrite': False,
-    },
-}
+# Enable or disable spider middlewares
+# See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+#SPIDER_MIDDLEWARES = {
+    #"buyee.middlewares.BuyeeSpiderMiddleware": 543,
+    #'scrapy_auto_trans.spidermiddlewares.autotrans.GoogleAutoTranslationMiddleware': 701,
+    #'scrapy_deltafetch.DeltaFetch': 100 Not needed because each request to a url is not unique for the products displayed on that url
+#}
+#DELTAFETCH_ENABLED = True
