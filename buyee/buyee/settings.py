@@ -74,7 +74,7 @@ DOWNLOAD_TIMEOUT = 4
 RETRY_ENABLED = False
 ROTATING_PROXY_PAGE_RETRY_TIMES = 100
 # Proxies to use
-ROTATING_PROXY_LIST_PATH = 'proxies.txt'
+ROTATING_PROXY_LIST_PATH = '../ProxyScrapers/workingProxies.txt'
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
