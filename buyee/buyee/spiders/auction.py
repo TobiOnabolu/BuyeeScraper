@@ -15,5 +15,14 @@ class AuctionSpider(scrapy.Spider):
             item['productPrice'] = product.css('span.g-priceFx::text').get()
             
             yield item
+
+        nextPageNum = response.css('a.arrow:contains(">")::attr("data-bind")').re_first(r'page":(\d+)')
+        
+        if (nextPageNum):
+            nextPageUrl = f'https://buyee.jp/item/search/category/2084005358?page={nextPageNum}'
+            self.logger.debug(f'URL WE ARE VISITING: {nextPageUrl}')
+            yield scrapy.Request(nextPageUrl, callback=self.parse)
+        else:
+            self.logger.info("NO MORE PAGES")
         
 

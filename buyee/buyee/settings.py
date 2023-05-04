@@ -7,6 +7,36 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+import copy
+from colorlog import ColoredFormatter
+import scrapy.utils.log
+
+
+color_formatter = ColoredFormatter(
+    (
+        '%(log_color)s%(levelname)-5s%(reset)s '
+        '%(green)s[%(asctime)s]%(reset)s'
+        '%(white)s %(name)s %(funcName)s %(bold_purple)s:%(lineno)d%(reset)s '
+        '%(log_color)s%(message)s%(reset)s'
+    ),
+    datefmt='%y-%m-%d %H:%M:%S',
+    log_colors={
+        'DEBUG': 'blue',
+        'INFO': 'bold_cyan',
+        'WARNING': 'yellow',
+        'ERROR': 'bg_bold_red',
+        'CRITICAL': 'red,bg_white',
+    }
+)
+
+_get_handler = copy.copy(scrapy.utils.log._get_handler)
+
+def _get_handler_custom(*args, **kwargs):
+    handler = _get_handler(*args, **kwargs)
+    handler.setFormatter(color_formatter)
+    return handler
+scrapy.utils.log._get_handler = _get_handler_custom
+
 BOT_NAME = "buyee"
 
 SPIDER_MODULES = ["buyee.spiders"]
@@ -26,23 +56,22 @@ FAKEUSERAGENT_PROVIDERS = [
 
 RANDOM_UA_PER_PROXY = True # Allows switch of header per proxy
 
-# scrapy-proxy-pool
-PROXY_POOL_ENABLED = True
-PROXY_POOL_REFRESH_INTERVAL = 1
-PROXY_POOL_FORCE_REFRESH = True
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-#    "buyee.middlewares.BuyeeDownloaderMiddleware": 543,
+    'buyee.middlewares.OutputProxyMiddleware': 630, # Checking if we are using a different proxy
     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': None, # Disabling to allow downloaded user agent to handle
     'scrapy.contrib.downloadermiddleware.retry.RetryMiddleware': None, # Disabling to allow downloaded user agent to handle
     'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 700, # Handles generating random useragent
     'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 701, # Retrying user agents
-    'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 610,  # Rotating proxies
-    'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620 # Checking if proxies fail
+#    'rotating_proxies.middlewares.RotatingProxyMiddleware': 610, # Rotate proxy
+#    'rotating_proxies.middlewares.BanDetectionMiddleware': 620 # Check not working proxies
 }
-    
+
+# Proxies to use
+ROTATING_PROXY_LIST_PATH = 'proxies.txt'
+
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
