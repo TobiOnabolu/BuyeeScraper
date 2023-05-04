@@ -10,7 +10,7 @@
 import copy
 from colorlog import ColoredFormatter
 import scrapy.utils.log
-
+import os
 
 color_formatter = ColoredFormatter(
     (
@@ -60,15 +60,19 @@ RANDOM_UA_PER_PROXY = True # Allows switch of header per proxy
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
+    'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware' : 600,
     'buyee.middlewares.OutputProxyMiddleware': 630, # Checking if we are using a different proxy
-    'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': None, # Disabling to allow downloaded user agent to handle
-    'scrapy.contrib.downloadermiddleware.retry.RetryMiddleware': None, # Disabling to allow downloaded user agent to handle
+    'scrapy.downloadermiddleware.useragent.UserAgentMiddleware': None, # Disabling to allow downloaded user agent to handle
+    'scrapy.downloadermiddleware.retry.RetryMiddleware': None, # Disabling to allow downloaded user agent to handle
     'scrapy_fake_useragent.middleware.RandomUserAgentMiddleware': 700, # Handles generating random useragent
     'scrapy_fake_useragent.middleware.RetryUserAgentMiddleware': 701, # Retrying user agents
-#    'rotating_proxies.middlewares.RotatingProxyMiddleware': 610, # Rotate proxy
-#    'rotating_proxies.middlewares.BanDetectionMiddleware': 620 # Check not working proxies
+    'rotating_proxies.middlewares.RotatingProxyMiddleware': 610, # Rotate proxy
+    'rotating_proxies.middlewares.BanDetectionMiddleware': 620 # Check not working proxies
 }
 
+DOWNLOAD_TIMEOUT = 4
+RETRY_ENABLED = False
+ROTATING_PROXY_PAGE_RETRY_TIMES = 100
 # Proxies to use
 ROTATING_PROXY_LIST_PATH = 'proxies.txt'
 
@@ -77,7 +81,8 @@ ROTATING_PROXY_LIST_PATH = 'proxies.txt'
 ITEM_PIPELINES = {
     "buyee.pipelines.TakeNewProductsPipeline": 290, # Add only new products to our db
     'buyee.pipelines.TranslateNamePipeline': 297, # Translate japanese names to english
-    'buyee.pipelines.CleanPricePipeline' : 295 # Sanitizing price data
+    'buyee.pipelines.CleanPricePipeline' : 295, # Sanitizing price data
+    'buyee.pipelines.AddBaseUrlPipeline' : 293, # Adding base url to productlinks
 }
 
 # Set settings whose default value is deprecated to a future-proof value
@@ -87,9 +92,9 @@ FEED_EXPORT_ENCODING = "utf-8"
 
 FEEDS = {
     # location where to save results
-    'auction.jsonl': {
+    'auction.csv': {
         # file format like json, jsonlines, xml and csv
-        'format': 'jsonl',
+        'format': 'csv',
         # use unicode text encoding:
         'encoding': 'utf8',
         # whether to export empty fields
@@ -98,6 +103,9 @@ FEEDS = {
         #'fields': ["title", "votes"],
         # every run will create new file, if False is set every run will append results to the existing ones
         'overwrite': False,
+        'item_export_kwargs': {
+           'include_headers_line': not os.path.exists('auction.csv'),
+        },
     },
 }
 

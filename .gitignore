@@ -9,7 +9,7 @@ __pycache__/
 
 # Proxy List
 proxies
-proxies.txt
+*proxies*.txt
 
 # C extensions
 *.so

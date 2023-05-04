@@ -8,13 +8,18 @@
 from scrapy.exceptions import DropItem
 from itemadapter import ItemAdapter
 from deep_translator import GoogleTranslator
-import json
+import logging
+import csv
+import requests
+from re import sub
+from decimal import Decimal
+
+logger = logging.getLogger(__name__)
 
 # Solves importing already seen products on the site
 class TakeNewProductsPipeline:
     def __init__(self):
         self.productIDs = self.getProducts()
-
     def process_item(self, item, spider):
         productID = item.get('productLink')
         
@@ -22,7 +27,7 @@ class TakeNewProductsPipeline:
         if productID is None or productID in self.productIDs:
             raise DropItem('Dropped product we have already seen')
         
-        # Not really needed since scrapy will add this id to json file at end of execution but good countermeasure
+        # Needed cause sometimes repeat products happen on further pages
         self.productIDs.add(productID)
 
         return item
@@ -33,31 +38,68 @@ class TakeNewProductsPipeline:
 
         # Try to load the JSON file into a Python list if file has been created
         try:
-            with open('auction.jsonl', 'r') as f:
-                for line in f:
-                    item = json.loads(line)
-                    productIDs.add(item['productLink'])
+            with open('auction.csv', 'r') as f:
+                csv_reader = csv.DictReader(f)
+                for row in csv_reader:
+                    productIDs.add(row['productLink'])
 
         except FileNotFoundError:
             # Handle the case where the file is missing
-            print("Error: File 'auction.jsonl' not found.")
+            print("Error: File 'auction.csv' not found.")
 
         return productIDs
 
 
+class AddBaseUrlPipeline:
+    def process_item(self, item, spider):
+        link = item.get('productLink')
+        item['productLink'] = f'https://buyee.jp{link}'
 
-
-
-
+        return item
         
 
 class CleanPricePipeline:
     def process_item(self, item, spider):
         price = item.get('productPrice')
-        if price:
-            item['productPrice'] = price[1:-1]
+
+        value = ''
+        currency = ''
+        for char in price:
+            if char.isalpha():
+                currency += char
+            elif char.isnumeric() or char in [',', '.']:
+                value += char
+        if currency == "CA": currency = "CAD"
+        elif currency == "US": currency = "USD"
+
+        item['productPrice'] = self.convertCurrency(value, currency)
 
         return item
+    
+    def convertCurrency(self, value, currency):
+        currency = currency.lower()
+        url = f'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/{currency}/usd.json'
+
+        logger.debug(f'Getting price data for {currency}...')
+        response = requests.get(url)
+
+        if response.status_code != 200:
+            logger.error(f'Failed to get price data from this url, {url}. \n Failed with status code {response.status_code}')
+            raise DropItem
+        
+        decimalValue = float(sub(r'[^\d.]', '', value))
+        data = response.json()
+        rate = data['usd']
+        price = '${:,.2f}'.format(decimalValue * rate)
+        return price
+        
+
+        
+
+        
+
+        
+
 
 class TranslateNamePipeline:
     def __init__(self):

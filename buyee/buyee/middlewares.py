@@ -35,7 +35,7 @@ class OutputProxyMiddleware:
         if proxy:
             spider.logger.debug('Using proxy: %s' % proxy)
         else:
-            spider.logger.warning('No proxy is being used')
+            raise IgnoreRequest('No proxy is being used')
         return None
 
     def spider_opened(self, spider):
