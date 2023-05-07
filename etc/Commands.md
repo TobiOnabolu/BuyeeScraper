@@ -19,3 +19,6 @@ div::text
 
 ## Make spider template
 scrapy genspider example
+
+## Allow spider to pause
+scrapy crawl auction -s JOBDIR=crawls/somespider-1
