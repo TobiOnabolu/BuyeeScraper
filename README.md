@@ -1,5 +1,6 @@
 # BuyeeScraper
 A webscraper that collects product information from Buyees Auction site for Male Jewlery.
+
 ![Screenshot](example.png)
 
 ## Installation
