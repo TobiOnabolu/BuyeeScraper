@@ -3,8 +3,8 @@
 A webscraper that collects product information from Buyees Auction site for Male Jewlery.
 
 ## Installation
-* Fork and clone the repo onto your computer using ```bash git clone --recurse-submodules <git url to project> ```
-* From the command line cd into root project folder and use this command to install dependencies. ```bash pip3 install -r requirements.txt ```
+* Fork and clone the repo onto your computer using ```git clone --recurse-submodules <git url to project> ```
+* From the command line cd into root project folder and use this command to install dependencies. ```pip3 install -r requirements.txt ```
 
 ## Usage
 ### Step 1: Gather Proxies
@@ -14,15 +14,15 @@ A webscraper that collects product information from Buyees Auction site for Male
 
 ### Step 2: Run Spider
 * From the command line cd into the root buyee folder. 
-* Run ```bash scrapy crawl auction ```
-* This command will start the spider and begin scraping the buyee Mens jewlery auction site. The spider will rotate proxies with each request and retry requests that failed due to failing proxies. The final result will be outputted to ```bash auction.csv ```
+* Run ```scrapy crawl auction ```
+* This command will start the spider and begin scraping the buyee Mens jewlery auction site. The spider will rotate proxies with each request and retry requests that failed due to failing proxies. The final result will be outputted to ```auction.csv ```
 
 ## Additional Comments
-* On each new spider run, the list of already seen products from ```bash auction.csv ``` will be loaded to a set to ensure that we only collect new products that have not been seen
+* On each new spider run, the list of already seen products from ```auction.csv ``` will be loaded to a set to ensure that we only collect new products that have not been seen
 * In the settings file these are some important configs:
-    *  ```bash DOWNLOAD_TIMEOUT ``` has been configured to 4 seconds. Meaning the spider will wait 4 seconds for attempting to retrieve a response from buyee.jp with a proxy. This ensure failing proxies do not waste alot of time and are quickly disposed if they aren't working.
-    * ```bash RETRY_ENABLED ``` has been set to ```bash FALSE ``` becuase ```bash     scrapy_fake_useragent.middleware.RetryUserAgentMiddleware ``` is responsible for handling the retry logic.
-    * ```bash ROTATING_PROXY_PAGE_RETRY_TIMES ``` has been set to 100 to allow multiple retries, since free proxies tend to fail alot, especially if we have a short timeout. Tip: It's better to have a small list of really good free proxies.
+    *  ```DOWNLOAD_TIMEOUT ``` has been configured to 4 seconds. Meaning the spider will wait 4 seconds for attempting to retrieve a response from buyee.jp with a proxy. This ensure failing proxies do not waste alot of time and are quickly disposed if they aren't working.
+    * ```RETRY_ENABLED ``` has been set to ```FALSE ``` becuase ```scrapy_fake_useragent.middleware.RetryUserAgentMiddleware ``` is responsible for handling the retry logic.
+    * ```ROTATING_PROXY_PAGE_RETRY_TIMES ``` has been set to 100 to allow multiple retries, since free proxies tend to fail alot, especially if we have a short timeout. Tip: It's better to have a small list of really good free proxies.
 
 ## Future Extensions
 
