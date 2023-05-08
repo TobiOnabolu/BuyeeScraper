@@ -1,6 +1,6 @@
 # BuyeeScraper
-
 A webscraper that collects product information from Buyees Auction site for Male Jewlery.
+![Screenshot](example.png)
 
 ## Installation
 * Fork and clone the repo onto your computer using ```git clone --recurse-submodules <git url to project> ```

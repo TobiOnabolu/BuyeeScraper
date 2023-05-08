@@ -1,0 +1,11 @@
+aiohttp==3.8.4
+aiohttp_socks==0.8.0
+beautifulsoup4==4.11.1
+colorlog==6.7.0
+deep_translator==1.10.1
+httpx==0.24.0
+itemadapter==0.8.0
+Requests==2.30.0
+rich==13.3.5
+Scrapy==2.8.0
+uvloop==0.17.0
