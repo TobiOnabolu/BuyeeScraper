@@ -1,9 +1,4 @@
 # TODO
-Add proxy scraper submodule
-
-Update product name selector
-
-Clean up and comment all code with nice documentation for each function and class
 
 Add detailed readme
 
