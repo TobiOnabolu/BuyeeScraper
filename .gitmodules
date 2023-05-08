@@ -1,0 +1,3 @@
+[submodule "ProxyScrapers"]
+	path = ProxyScrapers
+	url = https://github.com/TobiOnabolu/ProxyScrapers
